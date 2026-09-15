@@ -33,7 +33,10 @@ class Maze():
         return grid
 
     def display(self):
-        for row in self.grid:
+        GREEN = "\033[92m"
+        RESET = "\033[0m"
+        path = set(self.solve_bfs())
+        for y, row in enumerate(self.grid):
             if row:
                 first_cell = row[0]
                 for cell in row:
@@ -45,13 +48,18 @@ class Maze():
                         print("   +", end="")
                 print()
 
-                for cell in row:
+                for x, cell in enumerate(row):
                     if cell.west == 1 and cell is first_cell:
                         print("|", end="")
-                    if cell.east == 1:
-                        print("   |", end="")
+                    if (x, y) in path:
+                        print(f"{GREEN} * {RESET}", end="")
                     else:
-                        print("    ", end="")
+                        print("   ", end="")
+
+                    if cell.east == 1:
+                        print("|", end="")
+                    else:
+                        print(" ", end="")
                 print()
 
         last_cell = self.grid[-1]
@@ -172,3 +180,42 @@ class Maze():
 
             if not changed:
                 break
+
+    def solve_bfs(self) -> list[tuple[int, int]]:
+        start: tuple[int, int] = (0, 0)
+        finish: tuple[int, int] = (self.width - 1, self.height - 1)
+        choices: list[list[tuple[int, int]]] = [[start]]
+        visited: list[tuple[int, int]] = [start]
+
+        while choices:
+            current_path = choices.pop(0)
+            current_pos = current_path[-1]
+            x, y = current_pos
+            way_list: list[str] = []
+            current_pos_east = x + 1, y
+            current_pos_west = x - 1, y
+            current_pos_north = x, y - 1
+            current_pos_south = x, y + 1
+
+            if current_pos != finish:
+                if self.grid[y][x].east == 0 and current_pos_east not in visited:
+                    way_list.append('E')
+                if self.grid[y][x].west == 0 and current_pos_west not in visited:
+                    way_list.append('W')
+                if self.grid[y][x].north == 0 and current_pos_north not in visited:
+                    way_list.append('N')
+                if self.grid[y][x].south == 0 and current_pos_south not in visited:
+                    way_list.append('S')
+
+                if 'E' in way_list:
+                    choices.append(current_path + [current_pos_east])
+                if 'W' in way_list:
+                    choices.append(current_path + [current_pos_west])
+                if 'N' in way_list:
+                    choices.append(current_path + [current_pos_north])
+                if 'S' in way_list:
+                    choices.append(current_path + [current_pos_south])
+                visited.append(current_pos)
+            else:
+                return current_path
+        return []
