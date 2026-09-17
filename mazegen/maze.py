@@ -16,10 +16,13 @@ class Cell():
 
 class Maze():
 
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, entry: tuple, exit: tuple):
         self.width: int = width
         self.height: int = height
+        self.entry: tuple = entry
+        self.exit: tuple = exit
         self.grid: list[list[Cell]] = self.create_grid()
+        self.logo_cells: set[tuple[int, int]] = self.logo_42()
 
     def create_grid(self):
         grid: list[list[Cell]] = []
@@ -34,6 +37,7 @@ class Maze():
 
     def display(self):
         GREEN = "\033[92m"
+        WHITE = "\033[97m"
         RESET = "\033[0m"
         path = set(self.solve_bfs())
         for y, row in enumerate(self.grid):
@@ -51,7 +55,9 @@ class Maze():
                 for x, cell in enumerate(row):
                     if cell.west == 1 and cell is first_cell:
                         print("|", end="")
-                    if (x, y) in path:
+                    if (x, y) in self.logo_cells:
+                        print(f"{WHITE}███{RESET}", end="")
+                    elif (x, y) in path:
                         print(f"{GREEN} * {RESET}", end="")
                     else:
                         print("   ", end="")
@@ -148,16 +154,20 @@ class Maze():
                     way_list: list[str] = []
                     if self.grid[y][x].sum() == 3:
 
-                        if x - 1 >= 0 and self.grid[y][x].west == 1:
+                        if (x - 1 >= 0 and self.grid[y][x].west == 1 and
+                                (x - 1, y) not in self.logo_cells):
                             way_list.append('W')
 
-                        if x + 1 < self.width and self.grid[y][x].east == 1:
+                        if (x + 1 < self.width and self.grid[y][x].east == 1
+                                and (x + 1, y) not in self.logo_cells):
                             way_list.append('E')
 
-                        if y - 1 >= 0 and self.grid[y][x].north == 1:
+                        if (y - 1 >= 0 and self.grid[y][x].north == 1
+                                and (x, y - 1) not in self.logo_cells):
                             way_list.append('N')
 
-                        if y + 1 < self.height and self.grid[y][x].south == 1:
+                        if (y + 1 < self.height and self.grid[y][x].south == 1
+                                and (x, y + 1) not in self.logo_cells):
                             way_list.append('S')
 
                         if way_list:
@@ -182,8 +192,8 @@ class Maze():
                 break
 
     def solve_bfs(self) -> list[tuple[int, int]]:
-        start: tuple[int, int] = (0, 0)
-        finish: tuple[int, int] = (self.width - 1, self.height - 1)
+        start: tuple[int, int] = self.entry
+        finish: tuple[int, int] = self.exit
         choices: list[list[tuple[int, int]]] = [[start]]
         visited: list[tuple[int, int]] = [start]
 
@@ -198,13 +208,17 @@ class Maze():
             current_pos_south = x, y + 1
 
             if current_pos != finish:
-                if self.grid[y][x].east == 0 and current_pos_east not in visited:
+                if (self.grid[y][x].east == 0 and
+                        current_pos_east not in visited):
                     way_list.append('E')
-                if self.grid[y][x].west == 0 and current_pos_west not in visited:
+                if (self.grid[y][x].west == 0 and
+                        current_pos_west not in visited):
                     way_list.append('W')
-                if self.grid[y][x].north == 0 and current_pos_north not in visited:
+                if (self.grid[y][x].north == 0 and
+                        current_pos_north not in visited):
                     way_list.append('N')
-                if self.grid[y][x].south == 0 and current_pos_south not in visited:
+                if (self.grid[y][x].south == 0 and
+                        current_pos_south not in visited):
                     way_list.append('S')
 
                 if 'E' in way_list:
@@ -219,3 +233,29 @@ class Maze():
             else:
                 return current_path
         return []
+
+    def logo_42(self) -> set[tuple[int, int]]:
+        pattern = [
+            [1, 0, 0, 0, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 0, 1, 1, 1],
+            [0, 0, 1, 0, 1, 0, 0],
+            [0, 0, 1, 0, 1, 1, 1],
+        ]
+        pattern_height = len(pattern)
+        pattern_weight = len(pattern[0])
+        start_x = (self.width - pattern_weight) // 2
+        start_y = (self.height - pattern_height) // 2
+
+        logo_cells: set[tuple[int, int]] = set()
+
+        for y in range(start_y, start_y + pattern_height):
+            for x in range(start_x, start_x + pattern_weight):
+                if pattern[y - start_y][x - start_x] == 1:
+                    self.grid[y][x].is_visited = True
+                    logo_cells.add((x, y))
+                    self.grid[y][x].north = 1
+                    self.grid[y][x].south = 1
+                    self.grid[y][x].east = 1
+                    self.grid[y][x].west = 1
+        return logo_cells
