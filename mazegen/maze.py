@@ -3,28 +3,35 @@ import random
 
 class Cell():
 
-    def __init__(self, north: bool, east: bool, south: bool, west: bool):
+    def __init__(self, north: int, east: int, south: int, west: int):
         self.north = north
         self.east = east
         self.south = south
         self.west = west
         self.is_visited = False
 
-    def sum(self):
+    def sum(self) -> int:
         return self.north + self.east + self.south + self.west
 
 
 class Maze():
 
-    def __init__(self, width: int, height: int, entry: tuple, exit: tuple):
+    def __init__(self, width: int, height: int, entry: tuple[int, int],
+                 exit: tuple[int, int]):
         self.width: int = width
         self.height: int = height
-        self.entry: tuple = entry
-        self.exit: tuple = exit
+        self.entry: tuple[int, int] = entry
+        self.exit: tuple[int, int] = exit
         self.grid: list[list[Cell]] = self.create_grid()
+        self.logo: bool = self.logo_bool()
         self.logo_cells: set[tuple[int, int]] = self.logo_42()
 
-    def create_grid(self):
+    def logo_bool(self) -> bool:
+        if self.width >= 9 and self.height >= 7:
+            return True
+        return False
+
+    def create_grid(self) -> list[list[Cell]]:
         grid: list[list[Cell]] = []
 
         for _ in range(self.height):
@@ -35,7 +42,7 @@ class Maze():
             grid.append(row)
         return grid
 
-    def display(self):
+    def display(self) -> None:
         GREEN = "\033[92m"
         WHITE = "\033[97m"
         RESET = "\033[0m"
@@ -55,7 +62,7 @@ class Maze():
                 for x, cell in enumerate(row):
                     if cell.west == 1 and cell is first_cell:
                         print("|", end="")
-                    if (x, y) in self.logo_cells:
+                    if (x, y) in self.logo_cells and self.logo:
                         print(f"{WHITE}███{RESET}", end="")
                     elif (x, y) in path:
                         print(f"{GREEN} * {RESET}", end="")
@@ -75,7 +82,7 @@ class Maze():
             print("---+", end="")
         print()
 
-    def break_wall(self):
+    def break_wall(self) -> None:
         current_pos: tuple[int, int] = (0, 0)
 
         new_list: list[tuple[int, int]] = [current_pos]
@@ -84,10 +91,10 @@ class Maze():
             way_list: list[tuple[int, int]] = []
             x, y = current_pos
 
-            current_pos_north: tuple = x, y - 1
-            current_pos_south: tuple = x, y + 1
-            current_pos_west: tuple = x - 1, y
-            current_pos_east: tuple = x + 1, y
+            current_pos_north: tuple[int, int] = x, y - 1
+            current_pos_south: tuple[int, int] = x, y + 1
+            current_pos_west: tuple[int, int] = x - 1, y
+            current_pos_east: tuple[int, int] = x + 1, y
 
             self.grid[y][x].is_visited = True
 
@@ -145,7 +152,7 @@ class Maze():
                 if new_list:
                     current_pos = new_list[-1]
 
-    def remove_dead_ends(self):
+    def remove_dead_ends(self) -> None:
         while True:
             changed = False
 
@@ -154,20 +161,24 @@ class Maze():
                     way_list: list[str] = []
                     if self.grid[y][x].sum() == 3:
 
-                        if (x - 1 >= 0 and self.grid[y][x].west == 1 and
-                                (x - 1, y) not in self.logo_cells):
+                        if (x - 1 >= 0 and self.grid[y][x].west == 1
+                                and ((x - 1, y) not in self.logo_cells
+                                     if self.logo else True)):
                             way_list.append('W')
 
                         if (x + 1 < self.width and self.grid[y][x].east == 1
-                                and (x + 1, y) not in self.logo_cells):
+                                and ((x + 1, y) not in self.logo_cells
+                                     if self.logo else True)):
                             way_list.append('E')
 
                         if (y - 1 >= 0 and self.grid[y][x].north == 1
-                                and (x, y - 1) not in self.logo_cells):
+                                and ((x, y - 1) not in self.logo_cells
+                                     if self.logo else True)):
                             way_list.append('N')
 
                         if (y + 1 < self.height and self.grid[y][x].south == 1
-                                and (x, y + 1) not in self.logo_cells):
+                                and ((x, y + 1) not in self.logo_cells
+                                     if self.logo else True)):
                             way_list.append('S')
 
                         if way_list:
@@ -235,6 +246,9 @@ class Maze():
         return []
 
     def logo_42(self) -> set[tuple[int, int]]:
+        if not self.logo:
+            return set()
+
         pattern = [
             [1, 0, 0, 0, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 1],
@@ -243,14 +257,14 @@ class Maze():
             [0, 0, 1, 0, 1, 1, 1],
         ]
         pattern_height = len(pattern)
-        pattern_weight = len(pattern[0])
-        start_x = (self.width - pattern_weight) // 2
+        pattern_width = len(pattern[0])
+        start_x = (self.width - pattern_width) // 2
         start_y = (self.height - pattern_height) // 2
 
         logo_cells: set[tuple[int, int]] = set()
 
         for y in range(start_y, start_y + pattern_height):
-            for x in range(start_x, start_x + pattern_weight):
+            for x in range(start_x, start_x + pattern_width):
                 if pattern[y - start_y][x - start_x] == 1:
                     self.grid[y][x].is_visited = True
                     logo_cells.add((x, y))
