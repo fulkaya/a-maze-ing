@@ -1,8 +1,23 @@
 from mazegen import Maze
+import sys
+import configuration
 
 
-if __name__ == "__main__":
-    grid = Maze(8, 6, (0, 0), (7, 5))
+def main():
+    if len(sys.argv) != 2:
+        return
+
+    try:
+        values = configuration.parse(sys.argv[1])
+    except Exception as e:
+        print(e)
+        return
+
+    grid = Maze(values)
     grid.break_wall()
     grid.remove_dead_ends()
     grid.display()
+
+
+if __name__ == "__main__":
+    main()

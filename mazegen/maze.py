@@ -1,4 +1,5 @@
 import random
+from configuration import Values
 
 
 class Cell():
@@ -16,12 +17,11 @@ class Cell():
 
 class Maze():
 
-    def __init__(self, width: int, height: int, entry: tuple[int, int],
-                 exit: tuple[int, int]):
-        self.width: int = width
-        self.height: int = height
-        self.entry: tuple[int, int] = entry
-        self.exit: tuple[int, int] = exit
+    def __init__(self, values: Values):
+        self.width: int = values.width
+        self.height: int = values.height
+        self.entry: tuple[int, int] = values.entry
+        self.exit: tuple[int, int] = values.exit
         self.grid: list[list[Cell]] = self.create_grid()
         self.logo: bool = self.logo_bool()
         self.logo_cells: set[tuple[int, int]] = self.logo_42()
