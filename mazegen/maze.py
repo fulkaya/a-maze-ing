@@ -14,6 +14,9 @@ class Cell():
     def sum(self) -> int:
         return self.north + self.east + self.south + self.west
 
+    def hex_sum(self) -> int:
+        return self.north * 1 + self.east * 2 + self.south * 4 + self.west * 8
+
 
 class Maze():
 
@@ -25,6 +28,7 @@ class Maze():
         self.grid: list[list[Cell]] = self.create_grid()
         self.logo: bool = self.logo_bool()
         self.logo_cells: set[tuple[int, int]] = self.logo_42()
+        self.path: list[tuple[int, int]] = []
 
     def logo_bool(self) -> bool:
         if self.width >= 9 and self.height >= 7:
@@ -242,6 +246,7 @@ class Maze():
                     choices.append(current_path + [current_pos_south])
                 visited.append(current_pos)
             else:
+                self.path = current_path
                 return current_path
         return []
 
