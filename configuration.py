@@ -1,5 +1,11 @@
-from pydantic import BaseModel, Field, model_validator
+import sys
 from typing import Self
+
+try:
+    from pydantic import BaseModel, Field, model_validator
+except ModuleNotFoundError as e:
+    print(e)
+    sys.exit()
 
 
 class InvalidFormatError(Exception):
@@ -22,21 +28,28 @@ class Values(BaseModel):
     @model_validator(mode='after')
     def validator(self) -> Self:
 
-        for e in self.entry:
-            if e < 0:
-                raise ValueError("Entry value can't be less than 0")
+        if self.entry[0] >= self.width or self.entry[1] >= self.height:
+            raise ValueError("Entry must be inside the maze")
 
-        for e in self.exit:
-            if e < 0:
-                raise ValueError("Exit value can't be less than 0")
+        if self.exit[0] >= self.width or self.exit[1] >= self.height:
+            raise ValueError("Exit must be inside the maze")
+
+        if self.entry[0] < 0 or self.entry[1] < 0:
+            raise ValueError("Entry value can't be less than 0")
+
+        if self.exit[0] < 0 or self.exit[1] < 0:
+            raise ValueError("Exit value can't be less than 0")
+
+        if self.entry[0] >= self.exit[0]:
+            raise ValueError("Entry must be at the left of the exit")
 
         return self
 
 
-def parse(config):
+def parse(config: str) -> Values:
     dict_value = {"width": "", "height": "", "entry": "",
                   "exit": "", "output_file": "",
-                  "perfect": "False", "seed": "False"}
+                  "perfect": False, "seed": False}
 
     with open(config) as f:
         lines = f.readlines()
@@ -45,17 +58,19 @@ def parse(config):
         line = line.rstrip("\n")
         key_value = line.rsplit("=")
 
-        if len(key_value) != 2:
-            raise InvalidFormatError(
-                f"Invalid key-value format: {line}"
-            )
+        if line[0] != "#":
 
-        if key_value[0].lower() not in dict_value.keys():
-            raise InvalidVariableError(
-                f"Invalid variable: {key_value[0]}"
-            )
+            if len(key_value) != 2:
+                raise InvalidFormatError(
+                    f"Invalid key-value format: {line}"
+                )
 
-        dict_value[(key_value[0].lower())] = key_value[1]
+            if key_value[0].lower() not in dict_value.keys():
+                raise InvalidVariableError(
+                    f"Invalid variable: {key_value[0]}"
+                )
+
+            dict_value[(key_value[0].lower())] = key_value[1]
 
     dict_value["entry"] = tuple(dict_value["entry"].split(","))
     dict_value["exit"] = tuple(dict_value["exit"].split(","))
@@ -64,5 +79,8 @@ def parse(config):
                         "Invalid value format: expected x,y")
 
     values = Values(**dict_value)
+
+    if values.width < 9 and values.height < 7:
+        print("Warning: The maze is too small to display '42' logo")
 
     return values
