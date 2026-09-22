@@ -19,7 +19,8 @@ def main() -> None:
         values = configuration.parse(sys.argv[1])
         grid = Maze(values)
         grid.break_wall()
-        grid.remove_dead_ends()
+        if values.perfect is False:
+            grid.remove_dead_ends()
         grid.display()
         output.display(grid)
         interactions.choices()
