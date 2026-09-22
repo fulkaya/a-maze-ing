@@ -23,7 +23,8 @@ def main() -> None:
             grid.remove_dead_ends()
         grid.display()
         output.display(grid)
-        interactions.choices()
+        menu = interactions.Choices()
+        menu.choices(grid)
 
     except ValidationError as e:
         print(ValidationError.errors(e)[0]["msg"].strip("Value error, "))

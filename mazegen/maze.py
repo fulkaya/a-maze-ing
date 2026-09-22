@@ -47,6 +47,7 @@ class Maze():
         return grid
 
     def display(self) -> None:
+        from interactions import Choices
         GREEN = "\033[92m"
         WHITE = "\033[97m"
         RESET = "\033[0m"
@@ -68,7 +69,7 @@ class Maze():
                         print("|", end="")
                     if (x, y) in self.logo_cells and self.logo:
                         print(f"{WHITE}███{RESET}", end="")
-                    elif (x, y) in path:
+                    elif (x, y) in path and Choices.open is True:
                         print(f"{GREEN} * {RESET}", end="")
                     else:
                         print("   ", end="")
