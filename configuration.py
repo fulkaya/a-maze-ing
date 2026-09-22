@@ -1,5 +1,5 @@
 import sys
-from typing import Self
+from typing import Self, Any
 
 try:
     from pydantic import BaseModel, Field, model_validator
@@ -16,14 +16,22 @@ class InvalidVariableError(Exception):
     pass
 
 
+class InvalidValueFormatError(Exception):
+    pass
+
+
+class MissingVariableError(Exception):
+    pass
+
+
 class Values(BaseModel):
     width: int = Field(ge=1)
     height: int = Field(ge=1)
     entry: tuple[int, int]
     exit: tuple[int, int]
-    perfect: bool = Field(default=False)
-    seed: bool = Field(default=False)
     output_file: str
+    perfect: bool = Field(default=False)
+    seed: int | None = Field(default=None)
 
     @model_validator(mode='after')
     def validator(self) -> Self:
@@ -47,9 +55,10 @@ class Values(BaseModel):
 
 
 def parse(config: str) -> Values:
-    dict_value = {"width": "", "height": "", "entry": "",
-                  "exit": "", "output_file": "",
-                  "perfect": False, "seed": False}
+    var = [
+        "WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT", "SEED"
+        ]
+    dict_value = {}
 
     with open(config) as f:
         lines = f.readlines()
@@ -58,25 +67,65 @@ def parse(config: str) -> Values:
         line = line.rstrip("\n")
         key_value = line.rsplit("=")
 
-        if line[0] != "#":
+        if line and line[0] != "#":
 
-            if len(key_value) != 2:
-                raise InvalidFormatError(
-                    f"Invalid key-value format: {line}"
-                )
+            if key_value[0] in var:
 
-            if key_value[0].lower() not in dict_value.keys():
+                if len(key_value) != 2:
+                    raise InvalidFormatError(
+                        f"Invalid key-value format: {line}"
+                    )
+
+                value: Any = None
+                if (key_value[0] == "WIDTH" or key_value[0] == "HEIGHT"
+                        or key_value[0] == "SEED"):
+                    try:
+                        value = int(key_value[1])
+                    except ValueError:
+                        raise InvalidValueFormatError(
+                            f"{key_value[0]} must be int"
+                            )
+
+                elif key_value[0] == "ENTRY" or key_value[0] == "EXIT":
+                    value = key_value[1].split(",")
+                    if len(value) != 2:
+                        raise InvalidFormatError(
+                            "Invalid entry format: expected x,y"
+                            )
+                    try:
+                        value[0] = int(value[0])
+                        value[1] = int(value[1])
+                    except ValueError:
+                        raise InvalidValueFormatError(
+                            f"{key_value[0]} coordinate must be int"
+                            )
+                    value = tuple(value)
+
+                elif key_value[0] == "OUTPUT_FILE":
+                    value = key_value[1]
+
+                elif key_value[0] == "PERFECT":
+                    if key_value[1] == "False":
+                        value = False
+                    elif key_value[1] == "True":
+                        value = True
+                    else:
+                        raise InvalidValueFormatError(
+                            f"{key_value[0]} must be bool"
+                            )
+
+            else:
                 raise InvalidVariableError(
                     f"Invalid variable: {key_value[0]}"
                 )
 
-            dict_value[(key_value[0].lower())] = key_value[1]
+            dict_value.update({key_value[0].lower(): value})
 
-    dict_value["entry"] = tuple(dict_value["entry"].split(","))
-    dict_value["exit"] = tuple(dict_value["exit"].split(","))
-    if len(dict_value["entry"]) != 2 or len(dict_value["exit"]) != 2:
-        raise InvalidFormatError(
-                        "Invalid value format: expected x,y")
+    for key in var[:-2]:
+        if not key.lower() in dict_value.keys():
+            raise MissingVariableError(
+                f"Missing required configuration variable: {key}"
+                )
 
     values = Values(**dict_value)
 
