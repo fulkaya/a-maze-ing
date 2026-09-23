@@ -8,6 +8,7 @@ try:
     from pydantic import ValidationError
 except ModuleNotFoundError as e:
     print(e)
+    print("To install the module run: 'make install'")
     sys.exit()
 
 

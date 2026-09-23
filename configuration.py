@@ -5,6 +5,7 @@ try:
     from pydantic import BaseModel, Field, model_validator
 except ModuleNotFoundError as e:
     print(e)
+    print("To install the module, run: 'make install'")
     sys.exit()
 
 
