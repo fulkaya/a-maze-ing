@@ -74,15 +74,14 @@ class Maze():
                 for x, cell in enumerate(row):
                     if cell.west == 1 and cell is first_cell:
                         print(f"{WALL}|{RESET}", end="")
-                    if (x, y) in self.logo_cells and self.logo:
+                    if (x, y) == self.entry:
+                        print("🇸​​​​  ", end="")
+                    elif (x, y) == self.exit:
+                        print("🇫  ", end="")
+                    elif (x, y) in self.logo_cells and self.logo:
                         print(f"{WHITE}███{RESET}", end="")
-                    elif (x, y) in path and Choices.open is True:
-                        if (x, y) == self.entry:
-                            print("🇸​​​​  ", end="")
-                        elif (x, y) == self.exit:
-                            print("🇫  ", end="")
-                        else:
-                            print(f"{GREEN} * {RESET}", end="")
+                    elif (x, y) in path and Choices.open is True:    
+                        print(f"{GREEN} * {RESET}", end="")
                     else:
                         print("   ", end="")
 
