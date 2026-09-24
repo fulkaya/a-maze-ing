@@ -67,6 +67,7 @@ def parse(config: str) -> Values:
     for line in lines:
         line = line.rstrip("\n")
         key_value = line.rsplit("=")
+        key_value = list(map(lambda x: x.strip(), key_value))
 
         if line and line[0] != "#":
 
