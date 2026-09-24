@@ -21,6 +21,8 @@ class Cell():
 class Maze():
 
     def __init__(self, values: Values):
+        if values.seed is not None:
+            random.seed(values.seed)
         self.width: int = values.width
         self.height: int = values.height
         self.entry: tuple[int, int] = values.entry
