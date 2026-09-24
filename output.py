@@ -26,10 +26,10 @@ def path_str(path: list[tuple[int, int]]) -> str:
     return direction
 
 
-def display(maze: Maze) -> None:
+def display(maze: Maze, filename: str) -> None:
     hex = "0123456789abcdef"
 
-    with open("output_maze.txt", "w") as f:
+    with open(filename, "w") as f:
 
         for line in maze.grid:
             for cell in line:
@@ -37,7 +37,6 @@ def display(maze: Maze) -> None:
             print(file=f)
 
         print(file=f)
-        print(maze.entry, file=f)
-        print(maze.exit, file=f)
-        print(file=f)
+        print(f"{maze.entry[0]},{maze.entry[1]}", file=f)
+        print(f"{maze.exit[0]},{maze.exit[1]}", file=f)
         print(path_str(maze.path), file=f)

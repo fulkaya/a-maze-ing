@@ -23,7 +23,7 @@ def main() -> None:
         if values.perfect is False:
             grid.remove_dead_ends()
         grid.display()
-        output.display(grid)
+        output.display(grid, values.output_file)
         menu = interactions.Choices()
         menu.choices(grid)
 
