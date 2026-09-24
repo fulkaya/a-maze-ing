@@ -1,4 +1,5 @@
 import sys
+import os
 
 try:
     from mazegen import Maze
@@ -14,6 +15,8 @@ except ModuleNotFoundError as e:
 
 def main() -> None:
     if len(sys.argv) != 2:
+        py_cmd = os.path.basename(sys.executable)
+        print(f"Usage: {py_cmd} {sys.argv[0]} <config_file>")
         return
 
     try:

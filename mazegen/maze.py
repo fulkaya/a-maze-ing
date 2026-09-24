@@ -82,7 +82,7 @@ class Maze():
                         print("🇫  ", end="")
                     elif (x, y) in self.logo_cells and self.logo:
                         print(f"{WHITE}███{RESET}", end="")
-                    elif (x, y) in path and Choices.open is True:    
+                    elif (x, y) in path and Choices.open is True:
                         print(f"{GREEN} * {RESET}", end="")
                     else:
                         print("   ", end="")
