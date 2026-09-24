@@ -49,8 +49,8 @@ class Values(BaseModel):
         if self.exit[0] < 0 or self.exit[1] < 0:
             raise ValueError("Exit value can't be less than 0")
 
-        if self.entry[0] >= self.exit[0]:
-            raise ValueError("Entry must be at the left of the exit")
+        if self.entry == self.exit:
+            raise ValueError("Entry and Exit coordinates must be different")
 
         return self
 
@@ -130,7 +130,7 @@ def parse(config: str) -> Values:
 
     values = Values(**dict_value)
 
-    if values.width < 9 and values.height < 7:
+    if values.width < 9 or values.height < 7:
         print("Warning: The maze is too small to display '42' logo")
 
     return values

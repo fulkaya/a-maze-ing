@@ -30,6 +30,12 @@ class Maze():
         self.logo_cells: set[tuple[int, int]] = self.logo_42()
         self.path: list[tuple[int, int]] = []
 
+        if values.entry in self.logo_cells or values.exit in self.logo_cells:
+            raise ValueError(
+                "The Entry or Exit coordinates overlap with the 42 logo "
+                "pattern.\nPlease enter valid coordinates outside the logo."
+            )
+
     def logo_bool(self) -> bool:
         if self.width >= 9 and self.height >= 7:
             return True
@@ -71,7 +77,12 @@ class Maze():
                     if (x, y) in self.logo_cells and self.logo:
                         print(f"{WHITE}███{RESET}", end="")
                     elif (x, y) in path and Choices.open is True:
-                        print(f"{GREEN} * {RESET}", end="")
+                        if (x, y) == self.entry:
+                            print("🇸​​​​  ", end="")
+                        elif (x, y) == self.exit:
+                            print("🇫  ", end="")
+                        else:
+                            print(f"{GREEN} * {RESET}", end="")
                     else:
                         print("   ", end="")
 
