@@ -1,16 +1,23 @@
-install:
-	pip install --upgrade pip
-	pip install -r requirements.txt
+CONFIG ?= config.txt
+VENV = .venv
+PYTHON = $(VENV)/bin/python
 
-run:
-	python3 a_maze_ing.py config.txt
+$(VENV)/bin/python:
+	python3 -m venv $(VENV)
 
-debug:
-	python3 -m pdb a_maze_ing.py config.txt
+install: $(VENV)/bin/python
+	$(PYTHON) -m pip install --upgrade pip
+	$(PYTHON) -m pip install -r requirements.txt
+
+run: $(VENV)/bin/python
+	$(PYTHON) a_maze_ing.py $(CONFIG)
+
+debug: $(VENV)/bin/python
+	$(PYTHON) -m pdb a_maze_ing.py $(CONFIG)
 
 clean:
-	rm -rf $$(find . -type d -name "__pycache__")
-	rm -rf $$(find . -type d -name ".mypy_cache")
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
 lint:
 	flake8 .
