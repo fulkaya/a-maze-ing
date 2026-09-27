@@ -3,6 +3,7 @@ import sys
 try:
     import a_maze_ing
     from mazegen import Maze
+    from display import display
 except ModuleNotFoundError as e:
     print(e)
     sys.exit()
@@ -36,14 +37,14 @@ class Choices:
 
         if choice == "2":
             Choices.open = not Choices.open
-            maze.display()
+            display(maze)
             self.choices(maze)
             return
 
         if choice == "3":
             Choices.color_index = (Choices.color_index + 1
                                    ) % len(Choices.colors)
-            maze.display()
+            display(maze)
             self.choices(maze)
             return
 

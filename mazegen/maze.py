@@ -3,8 +3,17 @@ from configuration import Values
 
 
 class Cell():
+    """Represents a single grid cell in the maze with 4 walls."""
 
     def __init__(self, north: int, east: int, south: int, west: int):
+        """Initialize a cell with all four directional walls.
+
+        Args:
+            north: 1 if north wall is closed, 0 if open.
+            east: 1 if east wall is closed, 0 if open.
+            south: 1 if south wall is closed, 0 if open.
+            west: 1 if west wall is closed, 0 if open.
+        """
         self.north = north
         self.east = east
         self.south = south
@@ -12,15 +21,43 @@ class Cell():
         self.is_visited = False
 
     def sum(self) -> int:
+        """Calculate the total number of closed walls.
+
+        Returns:
+            The sum of all four walls (0 to 4).
+        """
         return self.north + self.east + self.south + self.west
 
     def hex_sum(self) -> int:
+        """Calculate the 4-bit bitmask encoding of the walls.
+
+        Bit representation:
+            Bit 0 (LSB): North
+            Bit 1: East
+            Bit 2: South
+            Bit 3: West
+
+        Returns:
+            An integer between 0 and 15 representing the wall configuration.
+        """
         return self.north * 1 + self.east * 2 + self.south * 4 + self.west * 8
 
 
 class Maze():
+    """A procedural maze generator supporting perfect
+    and braided grid layouts."""
 
     def __init__(self, values: Values):
+        """Initialize the maze attributes, grid, and embedded 42 logo.
+
+        Args:
+            values: Parsed configuration settings containing
+            maze dimensions, coordinates, seed, and output options.
+
+        Raises:
+            ValueError: If the entry or exit overlaps
+            with the '42' logo pattern.
+        """
         if values.seed is not None:
             random.seed(values.seed)
         self.width: int = values.width
@@ -39,11 +76,22 @@ class Maze():
             )
 
     def logo_bool(self) -> bool:
+        """Determine whether the maze dimensions are large enough
+        for the 42 logo.
+
+        Returns:
+            True if width >= 9 and height >= 7, False otherwise.
+        """
         if self.width >= 9 and self.height >= 7:
             return True
         return False
 
     def create_grid(self) -> list[list[Cell]]:
+        """Construct the initial 2D grid filled with fully walled cells.
+
+        Returns:
+            A 2D list of Cell objects representing the uncarved maze.
+        """
         grid: list[list[Cell]] = []
 
         for _ in range(self.height):
@@ -55,6 +103,12 @@ class Maze():
         return grid
 
     def break_wall(self) -> None:
+        """Generate a maze using randomized depth-first search
+        (recursive backtracker).
+
+        Iterates through unvisited cells and knocks down adjacent walls between
+        cells until all reachable parts of the grid are connected.
+        """
         current_pos: tuple[int, int] = (0, 0)
 
         new_list: list[tuple[int, int]] = [current_pos]
@@ -125,6 +179,11 @@ class Maze():
                     current_pos = new_list[-1]
 
     def remove_dead_ends(self) -> None:
+        """Braid the maze by opening extra walls at dead-end corridors.
+
+        Iteratively scans for cells with three closed walls and carves an open
+        path to an adjacent valid cell to create loops when PERFECT is False.
+        """
         while True:
             changed = False
 
@@ -175,6 +234,13 @@ class Maze():
                 break
 
     def solve_bfs(self) -> list[tuple[int, int]]:
+        """Find the shortest path between entry and exit using
+        breadth-first search.
+
+        Returns:
+            A list of (x, y) coordinate tuples representing the shortest path
+            from entry to exit, or an empty list if no path exists.
+        """
         start: tuple[int, int] = self.entry
         finish: tuple[int, int] = self.exit
         choices: list[list[tuple[int, int]]] = [[start]]
@@ -219,6 +285,12 @@ class Maze():
         return []
 
     def logo_42(self) -> set[tuple[int, int]]:
+        """Center and carve the '42' pattern as blocked cells within the maze.
+
+        Returns:
+            A set of (x, y) coordinates occupied by the '42' pattern cells,
+            or an empty set if the maze size is too small.
+        """
         if not self.logo:
             return set()
 
