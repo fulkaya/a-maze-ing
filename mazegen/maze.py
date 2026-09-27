@@ -1,5 +1,4 @@
 import random
-from configuration import Values
 
 
 class Cell():
@@ -47,7 +46,15 @@ class Maze():
     """A procedural maze generator supporting perfect
     and braided grid layouts."""
 
-    def __init__(self, values: Values):
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        entry: tuple[int, int],
+        exit: tuple[int, int],
+        seed: int | None = None,
+        perfect: bool = True
+            ):
         """Initialize the maze attributes, grid, and embedded 42 logo.
 
         Args:
@@ -58,18 +65,19 @@ class Maze():
             ValueError: If the entry or exit overlaps
             with the '42' logo pattern.
         """
-        if values.seed is not None:
-            random.seed(values.seed)
-        self.width: int = values.width
-        self.height: int = values.height
-        self.entry: tuple[int, int] = values.entry
-        self.exit: tuple[int, int] = values.exit
+        if seed is not None:
+            random.seed(seed)
+        self.width: int = width
+        self.height: int = height
+        self.entry: tuple[int, int] = entry
+        self.exit: tuple[int, int] = exit
+        self.perfect: bool = perfect
         self.grid: list[list[Cell]] = self.create_grid()
         self.logo: bool = self.logo_bool()
         self.logo_cells: set[tuple[int, int]] = self.logo_42()
         self.path: list[tuple[int, int]] = []
 
-        if values.entry in self.logo_cells or values.exit in self.logo_cells:
+        if entry in self.logo_cells or exit in self.logo_cells:
             raise ValueError(
                 "The Entry or Exit coordinates overlap with the 42 logo "
                 "pattern.\nPlease enter valid coordinates outside the logo."

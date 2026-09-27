@@ -22,7 +22,14 @@ def main() -> None:
 
     try:
         values = configuration.parse(sys.argv[1])
-        grid = Maze(values)
+        grid = Maze(
+            width=values.width,
+            height=values.height,
+            entry=values.entry,
+            exit=values.exit,
+            seed=values.seed,
+            perfect=values.perfect
+        )
         grid.break_wall()
         if values.perfect is False:
             grid.remove_dead_ends()
