@@ -26,12 +26,12 @@ fclean: clean
 	rm -rf $(VENV)
 
 lint: $(VENV)/bin/python
-	$(FLAKE8) .
-	$(MYPY) . --warn-return-any --warn-unused-ignores --ignore-missing-imports \
+	$(FLAKE8) --exclude=$(VENV) .
+	$(MYPY) --exclude $(VENV) . --warn-return-any --warn-unused-ignores --ignore-missing-imports \
 		--disallow-untyped-defs --check-untyped-defs
 
 lint-strict: $(VENV)/bin/python
-	$(FLAKE8) .
-	$(MYPY) . --strict
+	$(FLAKE8) --exclude=$(VENV) .
+	$(MYPY) --exclude $(VENV) . --strict
 
-.PHONY: install run debug clean lint lint-strict
+.PHONY: install run debug clean fclean lint lint-strict
