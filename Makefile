@@ -1,6 +1,8 @@
 CONFIG ?= config.txt
 VENV = .venv
 PYTHON = $(VENV)/bin/python
+FLAKE8 = $(VENV)/bin/flake8
+MYPY = $(VENV)/bin/mypy
 
 $(VENV)/bin/python:
 	python3 -m venv $(VENV)
@@ -19,13 +21,16 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
-lint:
-	flake8 .
-	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports \
+fclean: clean
+	rm -rf $(VENV)
+
+lint: $(VENV)/bin/python
+	$(FLAKE8) .
+	$(MYPY) . --warn-return-any --warn-unused-ignores --ignore-missing-imports \
 		--disallow-untyped-defs --check-untyped-defs
 
-lint-strict:
-	flake8 .
-	mypy . --strict
+lint-strict: $(VENV)/bin/python
+	$(FLAKE8) .
+	$(MYPY) . --strict
 
 .PHONY: install run debug clean lint lint-strict

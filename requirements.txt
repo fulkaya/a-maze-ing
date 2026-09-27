@@ -1,1 +1,3 @@
-pydantic==2.13.5
+pydantic>=2
+flake8
+mypy
