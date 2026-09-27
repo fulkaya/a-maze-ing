@@ -3,6 +3,7 @@ import os
 
 try:
     from mazegen import Maze
+    from display import display
     import configuration
     import interactions
     import output
@@ -25,8 +26,8 @@ def main() -> None:
         grid.break_wall()
         if values.perfect is False:
             grid.remove_dead_ends()
-        grid.display()
-        output.display(grid, values.output_file)
+        display(grid)
+        output.output(grid, values.output_file)
         menu = interactions.Choices()
         menu.choices(grid)
 

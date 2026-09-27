@@ -26,7 +26,7 @@ def path_str(path: list[tuple[int, int]]) -> str:
     return direction
 
 
-def display(maze: Maze, filename: str) -> None:
+def output(maze: Maze, filename: str) -> None:
     hex = "0123456789abcdef"
 
     with open(filename, "w") as f:

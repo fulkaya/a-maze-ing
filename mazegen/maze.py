@@ -54,52 +54,6 @@ class Maze():
             grid.append(row)
         return grid
 
-    def display(self) -> None:
-        from interactions import Choices
-        GREEN = "\033[92m"
-        WHITE = "\033[97m"
-        RESET = "\033[0m"
-        WALL = Choices.colors[Choices.color_index]
-        path = set(self.solve_bfs())
-        for y, row in enumerate(self.grid):
-            if row:
-                first_cell = row[0]
-                for cell in row:
-                    if cell is first_cell:
-                        print(f"{WALL}+{RESET}", end="")
-                    if cell.north == 1:
-                        print(f"{WALL}---+{RESET}", end="")
-                    else:
-                        print(f"{WALL}   +{RESET}", end="")
-                print()
-
-                for x, cell in enumerate(row):
-                    if cell.west == 1 and cell is first_cell:
-                        print(f"{WALL}|{RESET}", end="")
-                    if (x, y) == self.entry:
-                        print("🇸​​​​  ", end="")
-                    elif (x, y) == self.exit:
-                        print("🇫  ", end="")
-                    elif (x, y) in self.logo_cells and self.logo:
-                        print(f"{WHITE}███{RESET}", end="")
-                    elif (x, y) in path and Choices.open is True:
-                        print(f"{GREEN} * {RESET}", end="")
-                    else:
-                        print("   ", end="")
-
-                    if cell.east == 1:
-                        print(f"{WALL}|{RESET}", end="")
-                    else:
-                        print(" ", end="")
-                print()
-
-        last_cell = self.grid[-1]
-        for cell in last_cell:
-            if cell.south == 1 and cell is first_cell:
-                print(f"{WALL}+{RESET}", end="")
-            print(f"{WALL}---+{RESET}", end="")
-        print()
-
     def break_wall(self) -> None:
         current_pos: tuple[int, int] = (0, 0)
 
