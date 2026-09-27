@@ -10,7 +10,7 @@ $(VENV)/bin/python:
 install: $(VENV)/bin/python
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -r requirements.txt
-	$(PYTHON) -m pip install mazegen-0.1.0-py3-none-any.whl
+	$(PYTHON) -m pip install mazegen-*-py3-none-any.whl
 
 run: $(VENV)/bin/python
 	$(PYTHON) a_maze_ing.py $(CONFIG)
