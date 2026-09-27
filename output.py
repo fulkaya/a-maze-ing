@@ -1,3 +1,11 @@
+"""Output serialization module for the A-Maze-ing project.
+
+Handles encoding maze cell wall configurations into hexadecimal
+representations, translating step-by-step path coordinates into
+directional string sequences, and writing final representations
+to text files according to 42 specifications.
+"""
+
 try:
     from mazegen import Maze
 except ModuleNotFoundError as e:
@@ -5,6 +13,18 @@ except ModuleNotFoundError as e:
 
 
 def path_str(path: list[tuple[int, int]]) -> str:
+    """Convert an ordered coordinate path into a cardinal direction
+    sequence string.
+
+    Iterates over successive coordinate pairs and maps transitions to
+    'N' (North), 'S' (South), 'E' (East), or 'W' (West).
+
+    Args:
+        path: List of (x, y) coordinates representing the maze traversal.
+
+    Returns:
+        A string composed of cardinal direction characters (e.g., 'EESSWNN').
+    """
     direction: str = ""
 
     for index, cell in enumerate(path):
@@ -27,6 +47,16 @@ def path_str(path: list[tuple[int, int]]) -> str:
 
 
 def output(maze: Maze, filename: str) -> None:
+    """Serialize the generated maze and its solution into a text file.
+
+    Writes the hexadecimal bitmask representation of all maze cells line
+    by line, followed by an empty line, entry coordinates, exit coordinates,
+    and the cardinal direction sequence representing the shortest path.
+
+    Args:
+        maze: The solved or configured Maze instance to be serialized.
+        filename: Destination path of the output text file.
+    """
     hex = "0123456789abcdef"
 
     with open(filename, "w") as f:

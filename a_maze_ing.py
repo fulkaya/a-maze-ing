@@ -1,3 +1,10 @@
+"""Entry point for the A-Maze-ing CLI application.
+
+Loads maze generation configurations from a file, constructs the grid,
+handles wall carving and braiding logic, displays the maze in terminal,
+serializes output, and initiates user interactions.
+"""
+
 import sys
 import os
 
@@ -15,6 +22,12 @@ except ModuleNotFoundError as e:
 
 
 def main() -> None:
+    """Parse CLI arguments, initialize the maze, and trigger the UI loop.
+
+    Validates command-line arguments, parses the configuration file,
+    instantiates the Maze object, runs path-carving algorithms, displays the
+    grid, writes hex output to disk, and opens the interactive menu.
+    """
     if len(sys.argv) != 2:
         py_cmd = os.path.basename(sys.executable)
         print(f"Usage: {py_cmd} {sys.argv[0]} <config_file>")

@@ -1,3 +1,10 @@
+"""Configuration parser and schema validator module for A-Maze-ing.
+
+This module reads key-value configuration text files, parses input tokens,
+validates coordinate bounds and boundary conditions using Pydantic, and returns
+a strongly typed Values object for maze generation.
+"""
+
 import sys
 from typing import Self, Any
 
@@ -10,22 +17,42 @@ except ModuleNotFoundError as e:
 
 
 class InvalidFormatError(Exception):
+    """Raised when a configuration line does not
+    conform to key=value format."""
     pass
 
 
 class InvalidVariableError(Exception):
+    """Raised when an unknown configuration variable
+    key is encountered."""
     pass
 
 
 class InvalidValueFormatError(Exception):
+    """Raised when a configuration variable value cannot
+    be parsed to its expected type."""
     pass
 
 
 class MissingVariableError(Exception):
+    """Raised when a mandatory configuration variable
+    is missing from the file."""
     pass
 
 
 class Values(BaseModel):
+    """Pydantic data model holding validated maze generation configurations.
+
+    Attributes:
+        width: Total horizontal cell count of the maze (must be >= 1).
+        height: Total vertical cell count of the maze (must be >= 1).
+        entry: Coordinate pair (x, y) specifying the entrance position.
+        exit: Coordinate pair (x, y) specifying the exit position.
+        output_file: Target path where the serialized maze representation
+        is written.
+        perfect: Whether the generated maze is a spanning tree (no loops).
+        seed: Deterministic integer seed for pseudo-random generation.
+    """
     width: int = Field(ge=1)
     height: int = Field(ge=1)
     entry: tuple[int, int]
@@ -36,7 +63,16 @@ class Values(BaseModel):
 
     @model_validator(mode='after')
     def validator(self) -> Self:
+        """Validate boundary conditions and positional
+        constraints on coordinates.
 
+        Raises:
+            ValueError: If entry/exit coordinates are outside grid
+            boundaries, less than zero, or equal to each other.
+
+        Returns:
+            Self: The validated model instance.
+        """
         if self.entry[0] >= self.width or self.entry[1] >= self.height:
             raise ValueError("Entry must be inside the maze")
 
@@ -56,6 +92,26 @@ class Values(BaseModel):
 
 
 def parse(config: str) -> Values:
+    """Parse a configuration file and validate its parameters
+    into a Values instance.
+
+    Reads key-value lines, skips comments and empty lines, checks types,
+    ensures mandatory fields exist, and instantiates the Values model.
+
+    Args:
+        config: Path to the configuration text file.
+
+    Returns:
+        Values: Validated configuration instance.
+
+    Raises:
+        InvalidFormatError: If a line syntax or coordinate pair is malformed.
+        InvalidVariableError: If an unrecognized key is encountered.
+        InvalidValueFormatError: If a value cannot be cast to its
+        required type.
+        MissingVariableError: If any mandatory configuration parameter
+        is absent.
+    """
     var = [
         "WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT", "SEED"
         ]

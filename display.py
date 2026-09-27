@@ -1,7 +1,24 @@
+"""Terminal visualization module for rendering maze grids and solution paths.
+
+Renders cell walls, borders, entrance/exit markers, embedded logos, and active
+solution paths using ANSI color sequences in the terminal.
+"""
+
 from mazegen import Maze
 
 
 def display(maze: Maze) -> None:
+    """Render the maze grid, walls, special points, and solution
+    path to stdout.
+
+    Iterates over each row and cell of the maze to construct horizontal and
+    vertical walls, marks the entry and exit coordinates with flag symbols,
+    renders embedded 42 logo blocks if enabled, and traces the solution path
+    using ANSI color codes based on current UI state.
+
+    Args:
+        maze: The Maze instance to be displayed.
+    """
     from interactions import Choices
     GREEN = "\033[92m"
     WHITE = "\033[97m"
