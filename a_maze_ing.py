@@ -44,12 +44,15 @@ def main() -> None:
             perfect=values.perfect
         )
         grid.break_wall()
-        if values.perfect is False:
+        if not values.perfect:
             grid.remove_dead_ends()
         display(grid)
         output.output(grid, values.output_file)
         menu = interactions.Choices()
         menu.choices(grid)
+
+    except KeyboardInterrupt: 
+        print()
 
     except ValidationError as e:
         print(ValidationError.errors(e)[0]["msg"].strip("Value error, "))
