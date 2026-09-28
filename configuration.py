@@ -174,7 +174,7 @@ def parse(config: str) -> Values:
 
             else:
                 raise InvalidVariableError(
-                    f"Invalid variable: {key_value[0]}"
+                    f"Invalid variable: {line}"
                 )
 
             dict_value.update({key_value[0].lower(): value})
