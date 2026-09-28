@@ -10,7 +10,7 @@ authors = [{ name = "fulkaya" },
 description = "Maze generator module"
 readme = "mazegen/README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 license-files = ["LICENSE.md"]
 
 [tool.setuptools.packages.find]
