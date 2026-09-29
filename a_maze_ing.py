@@ -49,9 +49,9 @@ def main() -> None:
         display(grid)
         output.output(grid, values.output_file)
         menu = interactions.Choices()
-        menu.choices(grid)
+        menu.choices(grid, values)
 
-    except KeyboardInterrupt: 
+    except KeyboardInterrupt:
         print()
 
     except ValidationError as e:

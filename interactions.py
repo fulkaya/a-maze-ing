@@ -8,7 +8,7 @@ or exit the program.
 import sys
 
 try:
-    import a_maze_ing
+    from configuration import Values
     from mazegen import Maze
     from display import display
 except ModuleNotFoundError as e:
@@ -36,7 +36,7 @@ class Choices:
         "\033[96m",  # Cyan
     ]
 
-    def choices(self, maze: Maze) -> None:
+    def choices(self, maze: Maze, values: Values) -> None:
         """Display the interactive menu prompt and process user commands.
 
         Presents options to re-generate the maze, toggle path visibility,
@@ -56,20 +56,32 @@ class Choices:
 
         if choice == "1":
             Choices.open = True
-            a_maze_ing.main()
+            grid = Maze(
+                        width=values.width,
+                        height=values.height,
+                        entry=values.entry,
+                        exit=values.exit,
+                        seed=values.seed,
+                        perfect=values.perfect
+                    )
+            grid.break_wall()
+            if not values.perfect:
+                grid.remove_dead_ends()
+            display(grid)
+            self.choices(maze, values)
             return
 
         if choice == "2":
             Choices.open = not Choices.open
             display(maze)
-            self.choices(maze)
+            self.choices(maze, values)
             return
 
         if choice == "3":
             Choices.color_index = (Choices.color_index + 1
                                    ) % len(Choices.colors)
             display(maze)
-            self.choices(maze)
+            self.choices(maze, values)
             return
 
         if choice == "4":
@@ -77,5 +89,5 @@ class Choices:
 
         else:
             print("\nPlease enter a valid input\n")
-            self.choices(maze)
+            self.choices(maze, values)
             return
