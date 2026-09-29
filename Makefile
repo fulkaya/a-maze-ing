@@ -1,4 +1,5 @@
 CONFIG ?= config.txt
+OUTPUT ?= maze.txt
 VENV = .venv
 PYTHON = $(VENV)/bin/python
 FLAKE8 = $(VENV)/bin/flake8
@@ -18,12 +19,18 @@ run: $(VENV)/bin/python
 debug: $(VENV)/bin/python
 	$(PYTHON) -m pdb a_maze_ing.py $(CONFIG)
 
+build: $(VENV)/bin/python
+	$(PYTHON) -m pip install --upgrade build
+	$(PYTHON) -m build
+
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
+	rm -rf dist build *.egg-info
 
 fclean: clean
 	rm -rf $(VENV)
+	rm -rf $(OUTPUT)
 
 lint: $(VENV)/bin/python
 	$(FLAKE8) --exclude=$(VENV) .
