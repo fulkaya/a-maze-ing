@@ -55,7 +55,8 @@ def main() -> None:
         print()
 
     except ValidationError as e:
-        print(ValidationError.errors(e)[0]["msg"].strip("Value error, "))
+        print(ValidationError.errors(e)[0]["msg"].
+              removeprefix("Value error, "))
 
     except Exception as e:
         print(e)
